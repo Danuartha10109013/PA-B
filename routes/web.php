@@ -7,6 +7,7 @@ use App\Http\Controllers\FullCalenderController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\KelolaAbsensiController;
 use App\Http\Controllers\KelolaCutiController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\ProfileController;
@@ -65,6 +66,12 @@ Route::middleware([AutoLogout::class])->group(function () {
             Route::put('/updatin/{id}',[KelolaCutiController::class,'updatin'])->name('kcuti.updatin');
             Route::put('/update/{id}',[KelolaCutiController::class,'update'])->name('kcuti.update');
             Route::get('/download/{id}',[KelolaCutiController::class,'download'])->name('kcuti.download');
+        });
+        
+        Route::prefix('klocation')->group(function () {
+            Route::get('/',[LocationController::class,'index'])->name('klocation');
+            Route::post('/location', [LocationController::class, 'store'])->name('klocation.store');
+            Route::put('/location/{id}', [LocationController::class, 'update'])->name('klocation.update');
         });
     });
 

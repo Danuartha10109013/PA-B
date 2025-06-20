@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AbsensiM;
+use App\Models\LocationM;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -11,7 +12,11 @@ class AbsensiController extends Controller
 {
     public function index(){
         $absen = AbsensiM::where('user_id',Auth::user()->id)->get();
-        return view('pages.pegawai.absensi.index',compact('absen'));
+        $lokasi = LocationM::find(1);
+        if(!$lokasi){
+            return redirect()->back()->with('error','Admin Belum Menyesuaikan Titik Lokasi Absen');
+        }
+        return view('pages.pegawai.absensi.index',compact('absen','lokasi'));
     }
     public function data(){
         $absen = AbsensiM::where('user_id',Auth::user()->id)->get();
@@ -19,7 +24,11 @@ class AbsensiController extends Controller
     }
 
     public function masuk(){
-        return view('pages.pegawai.absensi.absen-masuk');
+        $lokasi = LocationM::find(1);
+        if(!$lokasi){
+            return redirect()->back()->with('error','Admin Belum Menyesuaikan Titik Lokasi Absen');
+        }
+        return view('pages.pegawai.absensi.absen-masuk',compact('lokasi'));
     }
 
 
@@ -73,7 +82,11 @@ class AbsensiController extends Controller
     }
 
     public function pulang(){
-        return view('pages.pegawai.absensi.absen-pulang');
+         $lokasi = LocationM::find(1);
+        if(!$lokasi){
+            return redirect()->back()->with('error','Admin Belum Menyesuaikan Titik Lokasi Absen');
+        }
+        return view('pages.pegawai.absensi.absen-pulang',compact('lokasi'));
     }
 
     public function absensiPulang(Request $request){

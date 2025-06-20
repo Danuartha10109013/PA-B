@@ -177,6 +177,15 @@
       <span class="hide-menu">Kelola Cuti</span>
     </a>
   </li>
+  <li class="sidebar-item {{ request()->routeIs('admin.klocation') ? 'active' : '' }}">
+    <a class="sidebar-link {{ request()->routeIs('admin.klocation') ? 'active' : '' }}" href="{{route('admin.klocation')}}"
+      aria-expanded="false">
+      <span>
+        <i class="fa fa-location"></i>
+      </span>
+      <span class="hide-menu">Kelola Lokasi</span>
+    </a>
+  </li>
 </ul>
 
 <script>
