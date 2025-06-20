@@ -26,10 +26,10 @@
     padding: 2rem 2rem 1.5rem 2rem;
     }
 
-    .modern-card:hover {
+    /* .modern-card:hover {
     box-shadow: 0 8px 32px rgba(60, 72, 100, .16);
     transform: translateY(-2px) scale(1.01);
-    }
+    } */
 
     .modern-header {
     display: flex;
@@ -127,11 +127,11 @@
     background: #ff6b6b;
     }
 
-    .modal-content {
+    /* /* .modal-content {
     border-radius: 18px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(60, 72, 100, .13);
-    }
+    } */
 
     .modal-header {
     background: linear-gradient(90deg, #6a93ff 0%, #a4cafe 100%);
@@ -217,6 +217,7 @@
           <th>Jabatan</th>
           <th>Action</th>
           <th>Profile</th>
+          <th>Acuan</th>
         </tr>
         </thead>
         <tbody>
@@ -246,6 +247,9 @@
         </td>
         <td class="text-center">
         <img class="avatar-table" src="{{asset('storage/' . $d->profile)}}" alt="profile">
+        </td>
+         <td class="text-center">
+        <img class="avatar-table" src="{{asset('storage/' . $d->acuan)}}" alt="acuan">
         </td>
         </tr>
         <!-- Edit Modal -->
@@ -319,12 +323,18 @@
           <input type="file" id="avatar-input-{{$d->id}}" name="avatar" class="form-control avatar-input"
             onchange="previewImage(event, 'avatar-preview-{{$d->id}}')">
           </div>
+          <div class="mb-3">
+          <label for="acuan" class="form-label">Acuan</label>
+          <input type="file" id="acuan-input-{{$d->id}}" name="acuan" class="form-control acuan-input"
+            onchange="previewImage(event, 'acuan-preview-{{$d->id}}')">
+          </div>
           <button type="submit" class="btn btn-modal">Save changes</button>
           </form>
           </div>
         </div>
         </div>
         </div>
+       
       @endforeach
         </tbody>
       </table>
@@ -369,6 +379,11 @@
           <input type="file" id="avatar-input-add" name="avatar" class="form-control avatar-input"
             onchange="previewImage(event, 'avatar-preview-add')">
           </div>
+          <div class="mb-3">
+          <label for="acuan" class="form-label">Acuan</label>
+          <input type="file" id="acuan-input-add" name="acuan" class="form-control acuan-input"
+            onchange="previewImage(event, 'acuan-preview-add')">
+          </div>
         </div>
         <div class="col-md-6">
           <div class="mb-3">
@@ -409,15 +424,26 @@
     </div>
   </div>
   <script>
-    function previewImage(event, previewId) {
+function previewImage(event, previewId, containerId = null) {
+  const input = event.target;
+  const preview = document.getElementById(previewId);
+  const container = containerId ? document.getElementById(containerId) : null;
+
+  if (input.files && input.files[0]) {
     const reader = new FileReader();
-    reader.onload = function () {
-      const output = document.getElementById(previewId);
-      output.src = reader.result;
-      output.style.display = 'block';
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.classList.remove('d-none');
+      if (container) container.classList.remove('d-none');
     };
-    reader.readAsDataURL(event.target.files[0]);
-    }
-  </script>
+    reader.readAsDataURL(input.files[0]);
+  } else {
+    preview.src = "";
+    preview.classList.add('d-none');
+    if (container) container.classList.add('d-none');
+  }
+}
+</script>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 @endsection

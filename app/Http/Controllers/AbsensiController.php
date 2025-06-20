@@ -25,6 +25,10 @@ class AbsensiController extends Controller
 
     public function masuk(){
         $lokasi = LocationM::find(1);
+        $acuan = Auth::user()->acuan;
+        if(!$acuan){
+            return redirect()->back()->with('error','Anda Belum Memasukan Acuan Absensi');
+        }
         if(!$lokasi){
             return redirect()->back()->with('error','Admin Belum Menyesuaikan Titik Lokasi Absen');
         }
@@ -48,18 +52,42 @@ class AbsensiController extends Controller
         $base64Photo = $request->input('photo_masuk');
 
         // Proses untuk menyimpan foto
-        $photoPath = $this->savePhoto($base64Photo);
+       $photoPath = $this->savePhoto($base64Photo);
 
-        // Simpan data absensi masuk ke database (contoh)
-        // Misal kita punya model Absensi
-        $absensi = new AbsensiM;
-        $absensi->user_id = Auth::user()->id;
-        $absensi->location = $location;
-        $absensi->photo = $photoPath;
-        $absensi->type = 'masuk'; // Menandakan ini absensi masuk
-        $absensi->save();
+        $acuanPath = public_path('storage/'.Auth::user()->acuan);
+        $absenPath = public_path($photoPath);
+        $scriptPath = base_path('python/face_match.py'); // Pastikan file ini ada di folder: project-root/python/
 
-        return redirect()->route('pegawai.absensi')->with('success', 'Absensi masuk berhasil disimpan.');
+        $command = "python " . escapeshellarg($scriptPath) . " " . escapeshellarg($acuanPath) . " " . escapeshellarg($absenPath) ;
+
+        $output = [];
+        exec($command, $output);
+        $result = trim(end($output));
+        $result = $output[0];
+// Debug:
+// dd( $result);
+
+        if ($result === 'no_face') {
+            return back()->with('error', 'Wajah tidak terdeteksi.');
+        } elseif ($result === 'not_match') {
+            return back()->with('error', 'Wajah tidak cocok dengan acuan.');
+        } elseif ($result === 'match') {
+            $absensi = new AbsensiM;
+            $absensi->user_id = Auth::user()->id;
+            $absensi->location = $request->input('location_masuk');
+            $absensi->photo = $photoPath;
+            $absensi->type = 'masuk';
+            $absensi->save();
+            return redirect()->route('pegawai.absensi')->with('success', 'Absensi berhasil. Wajah cocok.');
+        } else {
+            return redirect()->back()->with('error', 'Gagal memproses pengenalan wajah.');
+        }
+        // $command = "python python/face_match.py \"$acuanPath\" \"$absenPath\"";
+        // $result = trim(shell_exec($command));
+
+       
+
+
     }
 
     // Fungsi untuk menyimpan foto dalam format base64
@@ -105,5 +133,29 @@ class AbsensiController extends Controller
         return redirect()->route('pegawai.absensi')->with('success','Absen Pulang Sukses');
 
     }
+
+   public function storeacuan(Request $request)
+{
+    // Validasi file gambar wajib
+    $request->validate([
+        'acuan' => 'required|image|mimes:jpeg,png,jpg|max:2048', // max 2MB
+    ]);
+
+    // Ambil file
+    $file = $request->file('acuan');
+
+    // Buat nama file unik
+    $filename = 'acuan_' . Auth::id() . '_' . time() . '.' . $file->getClientOriginalExtension();
+
+    // Simpan ke folder public/storage/acuan
+    $path = $file->storeAs('public/acuan', $filename);
+
+    // Simpan path ke user (hanya relative path dari 'storage/')
+    $user = Auth::user();
+    $user->acuan = 'acuan/' . $filename;
+    $user->save();
+
+    return redirect()->back()->with('success', 'Foto acuan berhasil disimpan.');
+}
 }
 

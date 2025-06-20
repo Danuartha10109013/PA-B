@@ -170,6 +170,28 @@
             </div>
         </div>
     </div>
+    @if (Auth::user()->acuan == 0)
+    <div class="container my-4">
+        <div class="card shadow rounded-4">
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h5 class="mb-0">Unggah Foto Acuan Wajah</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('pegawai.absensi.acuan.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="acuan" class="form-label">Pilih Foto</label>
+                        <input type="file" class="form-control" id="acuan" name="acuan" accept="image/*" required>
+                        <small class="text-muted">Gunakan foto dengan wajah yang jelas dan satu orang.</small>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-upload"></i> Simpan Acuan
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <div class="row animate__animated animate__fadeInUp">
         <div class="col-lg-8 d-flex align-items-stretch dashboard-section">

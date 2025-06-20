@@ -87,6 +87,7 @@ Route::middleware([AutoLogout::class])->group(function () {
             Route::post('/storemasuk',[AbsensiController::class,'absensiMasuk'])->name('absensi.masuk.store');
             Route::get('/pulang',[AbsensiController::class,'pulang'])->name('absensi.pulang');
             Route::post('/storepulang',[AbsensiController::class,'absensiPulang'])->name('absensi.pulang.store');
+            Route::post('/storeacuan',[AbsensiController::class,'storeacuan'])->name('absensi.acuan.store');
         });
         Route::prefix('cuti')->group(function () {
 

@@ -176,6 +176,16 @@
                             <textarea type="text" class="form-control" id="alamat"
                                 name="alamat">{{ $data->alamat ?? '' }}</textarea>
                         </div>
+                        <div class="mb-3">
+                            <label for="acuan" class="form-label">acuan</label>
+                            <div class="mb-2">
+                                <img src="{{ asset('storage/' . $data->acuan) }}" alt="{{ $data->acuan }}"
+                                    class="avatar-preview" id="acuan-preview"
+                                    style="{{ $data->acuan ? '' : 'display:none;' }}">
+                            </div>
+                            <input type="file" id="acuan-input" name="acuan" class="form-control avatar-input"
+                                onchange="previewImage(event)">
+                        </div>
                     </div>
                     <div class="col-md-6 text-center">
                         <div class="mb-3">

@@ -24,6 +24,7 @@ class ProfileController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $id,
             'password' => 'nullable|min:6|confirmed',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'acuan' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'gender' => 'nullable',
             'no_wa' => 'nullable',
             'tempat_lahir' => 'nullable',
@@ -57,6 +58,16 @@ class ProfileController extends Controller
             // Store the new profile picture
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
             $user->profile = $avatarPath;
+        }
+        if ($request->hasFile('acuan')) {
+            // Delete the old profile picture if it exists
+            if ($user->acuan) {
+                Storage::disk('public')->delete($user->acuan);
+            }
+    
+            // Store the new profile picture
+            $avatarPath = $request->file('acuan')->store('acuan', 'public');
+            $user->acuan = $avatarPath;
         }
 
         // Save the updated user details

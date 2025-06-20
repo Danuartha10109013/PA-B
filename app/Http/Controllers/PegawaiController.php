@@ -40,6 +40,7 @@ class PegawaiController extends Controller
             'gender' => 'nullable',
             'no_wa' => 'nullable',
             'tempat_lahir' => 'nullable',
+            'acuan' => 'required|image|mimes:jpeg,png|max:2048',
         ]);
 
         // Insert new employee into the database
@@ -73,6 +74,16 @@ class PegawaiController extends Controller
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
             $user->profile = $avatarPath;
         }
+        if ($request->hasFile('acuan')) {
+            // Delete the old profile picture if it exists
+            if ($user->acuan) {
+                Storage::disk('public')->delete($user->acuan);
+            }
+    
+            // Store the new profile picture
+            $acuanPath = $request->file('acuan')->store('acuan', 'public');
+            $user->acuan = $acuanPath;
+        }
 
         $user->save();
 
@@ -89,7 +100,9 @@ class PegawaiController extends Controller
             'jabatan' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
             'password' => 'nullable|string|min:6', // Password validation
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Limit file size to 2MB
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'acuan' => 'required|image|mimes:jpeg,png|max:2048',
+             // Limit file size to 2MB
         ]);
 
         // Find the user by ID
@@ -120,6 +133,17 @@ class PegawaiController extends Controller
             // Store the new avatar and update the profile path
             $path = $request->file('avatar')->store('avatars', 'public');
             $user->profile = $path;
+        }
+
+        if ($request->hasFile('acuan')) {
+            // Delete the old profile picture if it exists
+            if ($user->acuan) {
+                Storage::disk('public')->delete($user->acuan);
+            }
+    
+            // Store the new profile picture
+            $acuanPath = $request->file('acuan')->store('acuan', 'public');
+            $user->acuan = $acuanPath;
         }
 
         // Save the updated user data
