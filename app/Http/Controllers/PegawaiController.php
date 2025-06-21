@@ -40,7 +40,7 @@ class PegawaiController extends Controller
             'gender' => 'nullable',
             'no_wa' => 'nullable',
             'tempat_lahir' => 'nullable',
-            'acuan' => 'required|image|mimes:jpeg,png|max:2048',
+            'acuan' => 'nullable|image|mimes:jpeg,png|max:2048',
         ]);
 
         // Insert new employee into the database
@@ -101,7 +101,7 @@ class PegawaiController extends Controller
             'email' => 'required|email|max:255',
             'password' => 'nullable|string|min:6', // Password validation
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'acuan' => 'required|image|mimes:jpeg,png|max:2048',
+            'acuan' => 'nullable|image|mimes:jpeg,png|max:2048',
              // Limit file size to 2MB
         ]);
 
