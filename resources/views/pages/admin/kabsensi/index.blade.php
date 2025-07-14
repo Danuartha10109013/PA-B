@@ -586,6 +586,9 @@
                             <div class="map-card mb-3">
                                 <div id="map-pulang-{{$d->id}}" style="height: 220px;"></div>
                             </div>
+                            <div class="photo-card mb-3"><strong>Bukti Absen:</strong><br><img
+                                        src="{{ asset('/' . $d->photo) }}" alt="Bukti Absen">
+                                </div>
                         </div>
                         <div class="modal-footer d-flex justify-content-between align-items-center">
                             @if ($d->confirmation == 1)
@@ -641,11 +644,10 @@
                             <div class="map-card mb-3">
                                 <div id="map-all-{{$d->id}}" style="height: 220px;"></div>
                             </div>
-                            @if ($d->type == 'masuk')
                                 <div class="photo-card mb-3"><strong>Bukti Absen:</strong><br><img
-                                        src="{{ asset('/' . $d->photo) }}" alt="Bukti Absen"></div>
-                            @endif
-                        </div>
+                                        src="{{ asset('/' . $d->photo) }}" alt="Bukti Absen">
+                                </div>
+                            </div>
                         <div class="modal-footer d-flex justify-content-between align-items-center">
                             @if ($d->confirmation == 1)
                                 <span class="badge-status verified">Absensi Telah dikonfirmasi</span>

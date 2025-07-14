@@ -27,7 +27,7 @@ class AbsensiController extends Controller
         $lokasi = LocationM::find(1);
         $acuan = Auth::user()->acuan;
         if(!$acuan){
-            return redirect()->back()->with('error','Anda Belum Memasukan Acuan Absensi');
+            return redirect()->back()->with('error','Acuan absensi belum dilengkapi. Silahkan hubungi admin');
         }
         if(!$lokasi){
             return redirect()->back()->with('error','Admin Belum Menyesuaikan Titik Lokasi Absen');
@@ -114,25 +114,74 @@ class AbsensiController extends Controller
         if(!$lokasi){
             return redirect()->back()->with('error','Admin Belum Menyesuaikan Titik Lokasi Absen');
         }
+        $acuan = Auth::user()->acuan;
+        if(!$acuan){
+            return redirect()->back()->with('error','Acuan absensi belum dilengkapi. Silahkan hubungi admin');
+        }
         return view('pages.pegawai.absensi.absen-pulang',compact('lokasi'));
     }
 
     public function absensiPulang(Request $request){
-        $request->validate([
+         $request->validate([
             'location_pulang' => 'required|string',
+            'photo_pulang' => 'required|string',
         ]);
 
-        $absensi = new AbsensiM;
+        // Ambil data lokasi (latitude, longitude)
+        $location = $request->input('location_pulang');
 
-        $absensi->location = $request->location_pulang;
-        $absensi->user_id = Auth::user()->id;
-        $absensi->type = "pulang";
+        // Ambil data base64 dari foto
+        $base64Photo = $request->input('photo_pulang');
 
-        $absensi->save();
+        // Proses untuk menyimpan foto
+       $photoPath = $this->savePhoto($base64Photo);
 
-        return redirect()->route('pegawai.absensi')->with('success','Absen Pulang Sukses');
+        $acuanPath = public_path('storage/'.Auth::user()->acuan);
+        $absenPath = public_path($photoPath);
+        $scriptPath = base_path('python/face_match.py'); // Pastikan file ini ada di folder: project-root/python/
 
+        $command = "python " . escapeshellarg($scriptPath) . " " . escapeshellarg($acuanPath) . " " . escapeshellarg($absenPath) ;
+
+        $output = [];
+        exec($command, $output);
+        $result = trim(end($output));
+        $result = $output[0];
+// Debug:
+// dd( $result);
+
+        if ($result === 'no_face') {
+            return back()->with('error', 'Wajah tidak terdeteksi.');
+        } elseif ($result === 'not_match') {
+            return back()->with('error', 'Wajah tidak cocok dengan acuan.');
+        } elseif ($result === 'match') {
+            $absensi = new AbsensiM;
+            $absensi->user_id = Auth::user()->id;
+            $absensi->location = $request->input('location_pulang');
+            $absensi->photo = $photoPath;
+            $absensi->type = 'pulang';
+            $absensi->save();
+            return redirect()->route('pegawai.absensi')->with('success', 'Absensi berhasil. Wajah cocok.');
+        } else {
+            return redirect()->back()->with('error', 'Gagal memproses pengenalan wajah.');
+        }
     }
+
+    // public function absensiPulang(Request $request){
+    //     $request->validate([
+    //         'location_pulang' => 'required|string',
+    //     ]);
+
+    //     $absensi = new AbsensiM;
+
+    //     $absensi->location = $request->location_pulang;
+    //     $absensi->user_id = Auth::user()->id;
+    //     $absensi->type = "pulang";
+
+    //     $absensi->save();
+
+    //     return redirect()->route('pegawai.absensi')->with('success','Absen Pulang Sukses');
+
+    // }
 
    public function storeacuan(Request $request)
 {
